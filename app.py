@@ -69,12 +69,23 @@ def checkout():
     checkout_request_validator.validate_credit_card(data['credit_card'])
 
     database.purchase_books(**data)
-    return {"message": "Checkout completed successfully"}
+
+    books_ids = ",".join([str(book_id) for book_id in data["book_ids"]])
+    response = Response({"message": "Checkout completed successfully"})
+    response.set_cookie("purchased_books", books_ids, max_age=30)
+    return response
 
 
 @app.get('/book_download')
 def book_download():
     book_id = request.args.get('book_id')
+    purchase_book_ids = request.cookies.get('purchased_books')
+
+    if not purchase_book_ids or not purchase_book_ids.strip():
+        abort(401, description="You must purchase a book before downloading it")
+    if not str(book_id) in set(purchase_book_ids.strip(",")):
+        abort(401)
+
     filename = database.get_book_file_name(int(book_id))
     return send_from_directory(directory=BOOKS_DIRECTORY, path=filename, as_attachment=True)
 
