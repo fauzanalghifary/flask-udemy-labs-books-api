@@ -40,6 +40,16 @@ def index():
     return app.send_static_file('index.html')
 
 
+@app.get('/categories/')
+def categories():
+    return database.get_all_supported_categories()
+
+
+@app.get('/books/')
+def get_books():
+    books = database.get_all_books()
+    return aggregate_books(books)
+
 
 def aggregate_books(books: List[Book]) -> dict:
     """
