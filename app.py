@@ -47,7 +47,11 @@ def categories():
 
 @app.get('/books/')
 def get_books():
-    books = database.get_all_books()
+    category = request.args.get('category')
+    if category is not None:
+        books = database.get_books_by_category(category)
+    else:
+        books = database.get_all_books()
     return aggregate_books(books)
 
 
