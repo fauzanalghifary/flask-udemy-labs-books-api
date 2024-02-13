@@ -55,6 +55,11 @@ def get_books():
     return aggregate_books(books)
 
 
+@app.get('/trending/<int:max_number_of_books>')
+def trending_books(max_number_of_books: int):
+    books = database.get_trending_books(max_number_of_books)
+    return aggregate_books(books)
+
 def aggregate_books(books: List[Book]) -> dict:
     """
     Creates a dictionary object that maps from 'books' to a list of book objects
