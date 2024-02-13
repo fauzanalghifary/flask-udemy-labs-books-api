@@ -35,6 +35,12 @@ database = Database()
 """Complete your code here"""
 
 
+@app.get('/')
+def index():
+    return app.send_static_file('index.html')
+
+
+
 def aggregate_books(books: List[Book]) -> dict:
     """
     Creates a dictionary object that maps from 'books' to a list of book objects
