@@ -60,6 +60,14 @@ def trending_books(max_number_of_books: int):
     books = database.get_trending_books(max_number_of_books)
     return aggregate_books(books)
 
+
+@app.post('/checkout/')
+def checkout():
+    data = request.get_json()
+    database.purchase_books(**data)
+    return {"message": "Checkout completed successfully"}
+
+
 def aggregate_books(books: List[Book]) -> dict:
     """
     Creates a dictionary object that maps from 'books' to a list of book objects
