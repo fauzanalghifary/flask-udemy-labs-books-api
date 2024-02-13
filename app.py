@@ -68,6 +68,13 @@ def checkout():
     return {"message": "Checkout completed successfully"}
 
 
+@app.get('/book_download')
+def book_download():
+    book_id = request.args.get('book_id')
+    filename = database.get_book_file_name(book_id)
+    return send_from_directory(directory=BOOKS_DIRECTORY, path=filename, as_attachment=True)
+
+
 def aggregate_books(books: List[Book]) -> dict:
     """
     Creates a dictionary object that maps from 'books' to a list of book objects
