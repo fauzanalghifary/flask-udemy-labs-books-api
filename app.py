@@ -64,6 +64,10 @@ def trending_books(max_number_of_books: int):
 @app.post('/checkout/')
 def checkout():
     data = request.get_json()
+    checkout_request_validator.validate_billing_info(first_name=data['first_name'], last_name=data['last_name'],
+                                                     billing_address=data['billing_address'])
+    checkout_request_validator.validate_credit_card(data['credit_card'])
+
     database.purchase_books(**data)
     return {"message": "Checkout completed successfully"}
 
@@ -71,9 +75,19 @@ def checkout():
 @app.get('/book_download')
 def book_download():
     book_id = request.args.get('book_id')
-    filename = database.get_book_file_name(book_id)
+    filename = database.get_book_file_name(int(book_id))
     return send_from_directory(directory=BOOKS_DIRECTORY, path=filename, as_attachment=True)
 
+
+@app.errorhandler(InvalidBillingInfo)
+def handle_invalid_billing_info_exception(e):
+    return Response(str(e), status=400, mimetype="text/plain")
+
+
+@app.errorhandler(CreditCardValidationException)
+def handle_credit_card_validation_exception(e):
+    app.logger.warning(e)
+    return Response(str(e), status=402, mimetype="text/plain")
 
 def aggregate_books(books: List[Book]) -> dict:
     """
